@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   variables:
-    S3_BUCKET: my-voting-appbucket   
-    LAMBDA_FUNCTION: VoteHandler      
+    S3_BUCKET: my-voting-appbucket
+    LAMBDA_FUNCTION: VoteHandler
 
 phases:
   install:
@@ -25,3 +25,4 @@ phases:
       - zip function.zip lambda_function.py
       - aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip
       - echo Build and deployment finished on `date`
+
