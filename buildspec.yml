@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  variables:
+    S3_BUCKET: my-voting-appbucket   
+    LAMBDA_FUNCTION: VoteHandler      
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo Installing dependencies...
+      - pip install awscli
+
+  build:
+    commands:
+      - echo Build started on `date`
+
+  post_build:
+    commands:
+      - echo Deploying frontend to S3...
+      - aws s3 sync frontend/ s3://$S3_BUCKET --delete
+      - echo Deploying backend to Lambda...
+      - zip function.zip lambda_function.py
+      - aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip
+      - echo Build and deployment finished on `date`
