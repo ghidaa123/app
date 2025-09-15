@@ -1,17 +1,16 @@
-version: 0.2
 
+version: 0.2
 phases:
   install:
     commands:
-      - echo Installing dependencies
+      - echo Installing dependencies...
   build:
     commands:
       - echo Build started on `date`
-      - echo Building project...
   post_build:
     commands:
-      - echo Build completed on `date`
-
-artifacts:
-  files:
-    - '**/*'
+      - echo Deploying frontend to S3...
+      - aws s3 sync frontend/ s3://my-voting-app-<yourname> --delete
+      - echo Deploying backend to Lambda...
+      - zip function.zip lambda_function.py
+      - aws lambda update-function-code --function-name VoteHandler --zip-file fileb://function.zip
