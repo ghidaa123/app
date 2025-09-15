@@ -20,9 +20,17 @@ phases:
   post_build:
     commands:
       - echo Deploying frontend to S3...
-      - aws s3 sync frontend/ s3://$S3_BUCKET --delete
+      - if [ -d "frontend" ]; then
+          aws s3 sync frontend/ s3://$S3_BUCKET --delete;
+        else
+          echo "frontend folder not found, skipping S3 deploy";
+        fi
       - echo Deploying backend to Lambda...
-      - zip function.zip lambda_function.py
-      - aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip
+      - if [ -f "lambda_function.py" ]; then
+          zip function.zip lambda_function.py;
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip;
+        else
+          echo "lambda_function.py not found, skipping Lambda deploy";
+        fi
       - echo Build and deployment finished on `date`
 
