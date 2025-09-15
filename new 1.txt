@@ -10,7 +10,7 @@ phases:
   post_build:
     commands:
       - echo Deploying frontend to S3...
-      - aws s3 sync frontend/ s3://my-voting-app-<yourname> --delete
+      - aws s3 sync frontend/ s3://my-voting-appbucket--delete
       - echo Deploying backend to Lambda...
       - zip function.zip lambda_function.py
       - aws lambda update-function-code --function-name VoteHandler --zip-file fileb://function.zip
