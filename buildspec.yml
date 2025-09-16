@@ -33,4 +33,8 @@ phases:
           echo "lambda-function.py not found, skipping Lambda deploy";
         fi
 
+      - echo Configuring S3 bucket for static website hosting...
+      - aws s3 website s3://$S3_BUCKET/ --index-document index.html --error-document index.html
+
       - echo Build and deployment finished on `date`
+      - echo Your website URL: http://$S3_BUCKET.s3-website-$AWS_DEFAULT_REGION.amazonaws.com
