@@ -12,7 +12,8 @@ phases:
       python: 3.9
     commands:
       - echo Installing dependencies...
-      - pip install awscli
+      - pip install --upgrade awscli
+      - aws --version
 
   build:
     commands:
@@ -20,20 +21,23 @@ phases:
 
   post_build:
     commands:
-      - echo "Listing files in root directory for debugging..."
+
+      - echo "Current working directory:"
+      - pwd
+      - echo "Files in root directory:"
       - ls -l
-      - echo "Contents of frontend folder for debugging..."
+      - echo "Files in frontend directory:"
       - ls -l frontend
 
-      - echo "Deploying frontend to S3..."
 
+      - echo "Deploying frontend to S3..."
       - if [ -f "index.html" ]; then
           aws s3 cp index.html s3://$S3_BUCKET/index.html --region $AWS_REGION;
         else
           echo "index.html not found!";
         fi
-
       - aws s3 cp -r frontend/ s3://$S3_BUCKET/ --exclude "lambda-function.py" --region $AWS_REGION
+
 
       - echo "Deploying backend to Lambda..."
       - if [ -f "frontend/lambda-function.py" ]; then
@@ -43,8 +47,13 @@ phases:
           echo "lambda-function.py not found, skipping Lambda deploy";
         fi
 
+
       - echo "Configuring S3 bucket for static website hosting..."
       - aws s3 website s3://$S3_BUCKET/ --index-document index.html --error-document index.html --region $AWS_REGION
 
+      - echo "Listing objects in S3 bucket:"
+      - aws s3 ls s3://$S3_BUCKET/ --region $AWS_REGION
+
       - echo Build and deployment finished on `date`
       - echo "Your website URL: http://$S3_BUCKET.s3-website-$AWS_REGION.amazonaws.com"
+
