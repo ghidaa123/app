@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title>Voting App</title>
+</head>
+<body>
+  <h1>Vote for your favorite!</h1>
+  <button onclick="vote('cats')">Cats</button>
+  <button onclick="vote('dogs')">Dogs</button>
+
+  <script>
+    async function vote(choice) {
+      const response = await fetch('https://4vrxnfpbw4.execute-api.us-east-1.amazonaws.com/vote', {
+        method: 'POST',
+        body: JSON.stringify({choice}),
+        headers: {'Content-Type':'application/json'}
+      });
+      const data = await response.json();
+      alert(data.message);
+    }
+  </script>
+</body>
+</html>
