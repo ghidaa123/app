@@ -28,9 +28,7 @@ phases:
       - echo Deploying backend to Lambda...
       - if [ -f "lambda_function.py" ]; then
           zip function.zip lambda_function.py;
-          aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip;
-        else
-          echo "lambda_function.py not found, skipping Lambda deploy";
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION ->        else
+          echo "lambda_function.py not found, skipping Lambda deploy";       
         fi
       - echo Build and deployment finished on `date`
-
