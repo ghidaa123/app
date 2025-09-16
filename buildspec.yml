@@ -20,7 +20,7 @@ phases:
   post_build:
     commands:
       - echo Deploying frontend to S3...
-      - aws s3 cp index.html s3://$S3_BUCKET/index.html
+      - aws s3 cp frontend/index.html s3://$S3_BUCKET/index.html
       - aws s3 cp -r frontend/ s3://$S3_BUCKET/ --exclude "lambda_function.py"
 
       - echo Deploying backend to Lambda...
@@ -32,4 +32,5 @@ phases:
         fi
 
       - echo Build and deployment finished on `date`
+
 
