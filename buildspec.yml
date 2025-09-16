@@ -4,6 +4,7 @@ env:
   variables:
     S3_BUCKET: my-voting-appbucket
     LAMBDA_FUNCTION: VoteHandler
+    AWS_REGION: us-east-1
 
 phases:
   install:
@@ -19,22 +20,31 @@ phases:
 
   post_build:
     commands:
-      - echo Deploying frontend to S3...
+      - echo "Listing files in root directory for debugging..."
+      - ls -l
+      - echo "Contents of frontend folder for debugging..."
+      - ls -l frontend
 
-      - aws s3 cp index.html s3://$S3_BUCKET/index.html
+      - echo "Deploying frontend to S3..."
 
-      - aws s3 cp -r frontend/ s3://$S3_BUCKET/ --exclude "lambda-function.py"
+      - if [ -f "index.html" ]; then
+          aws s3 cp index.html s3://$S3_BUCKET/index.html --region $AWS_REGION;
+        else
+          echo "index.html not found!";
+        fi
 
-      - echo Deploying backend to Lambda...
+      - aws s3 cp -r frontend/ s3://$S3_BUCKET/ --exclude "lambda-function.py" --region $AWS_REGION
+
+      - echo "Deploying backend to Lambda..."
       - if [ -f "frontend/lambda-function.py" ]; then
           zip function.zip frontend/lambda-function.py;
-          aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip;
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION --zip-file fileb://function.zip --region $AWS_REGION;
         else
           echo "lambda-function.py not found, skipping Lambda deploy";
         fi
 
-      - echo Configuring S3 bucket for static website hosting...
-      - aws s3 website s3://$S3_BUCKET/ --index-document index.html --error-document index.html
+      - echo "Configuring S3 bucket for static website hosting..."
+      - aws s3 website s3://$S3_BUCKET/ --index-document index.html --error-document index.html --region $AWS_REGION
 
       - echo Build and deployment finished on `date`
-      - echo Your website URL: http://$S3_BUCKET.s3-website-$AWS_DEFAULT_REGION.amazonaws.com
+      - echo "Your website URL: http://$S3_BUCKET.s3-website-$AWS_REGION.amazonaws.com"
