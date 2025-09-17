@@ -64,7 +64,7 @@ http://my-voting-appbucket.s3-website-us-east-1.amazonaws.com
 - CI/CD pipeline automates deployment  
 - Debugging logs available in CloudWatch
 
-##App Screenshots
+## App Screenshots
 Here's what the voting interface looks like in action:
 ![Voting App Interface](images/voting-ui.png)
 
