@@ -1,0 +1,6 @@
+![Voting App Interface](images/voting-ui.png)
+
+And here's the CloudWatch logs showing votes being processed in real-time:
+
+![CloudWatch Logs](images/cloudwatch-logs.png)
+*CloudWatch logs capturing every vote as it gets processed by the Lambda function*
