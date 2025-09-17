@@ -1,4 +1,4 @@
-# AWS Voting App Ì∑≥Ô∏è
+# AWS Voting App 
 
 ## Description
 This project is a web-based voting application with a static frontend hosted on **AWS S3** and backend logic implemented in **AWS Lambda**.  
