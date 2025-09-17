@@ -1,22 +1,67 @@
-<html>
-<head>
-  <title>Voting App</title>
-</head>
-<body>
-  <h1>Vote for your favorite!</h1>
-  <button onclick="vote('cats')">Cats</button>
-  <button onclick="vote('dogs')">Dogs</button>
+import json
+import boto3
+import logging
+from datetime import datetime
 
-  <script>
-    async function vote(choice) {
-      const response = await fetch('https://4vrxnfpbw4.execute-api.us-east-1.amazonaws.com/vote', {
-        method: 'POST',
-        body: JSON.stringify({choice}),
-        headers: {'Content-Type':'application/json'}
-      });
-      const data = await response.json();
-      alert(data.message);
-    }
-  </script>
-</body>
-</html>
+# Set up logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('vote-table')  
+
+def lambda_handler(event, context):
+    try:
+        # Log the entire incoming event for debugging
+        logger.info(f"Received event: {json.dumps(event)}")
+        
+        # Parse the body
+        body = json.loads(event.get('body', '{}'))
+        choice = body.get('choice', 'unknown')
+        
+        # Log the vote details
+        logger.info(f"VOTE_RECEIVED: User voted for '{choice}' at {datetime.utcnow().isoformat()}")
+        
+        # Store in DynamoDB
+        response = table.put_item(
+            Item={
+                'Choice': choice,
+                'Timestamp': datetime.utcnow().isoformat(),
+                'RequestId': context.aws_request_id
+            }
+        )
+        
+        # Log successful storage
+        logger.info(f"VOTE_STORED: Successfully stored vote for '{choice}' in DynamoDB")
+        
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+            },
+            'body': json.dumps({
+                'message': f'Vote for {choice} recorded',
+                'vote': choice,
+                'timestamp': datetime.utcnow().isoformat()
+            })
+        }
+        
+    except Exception as e:
+        # Log any errors
+        logger.error(f"ERROR_PROCESSING_VOTE: {str(e)}")
+        logger.error(f"Event that caused error: {json.dumps(event)}")
+        
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+            },
+            'body': json.dumps({
+                'error': 'Failed to process vote',
+                'message': str(e)
+            })
+        }
